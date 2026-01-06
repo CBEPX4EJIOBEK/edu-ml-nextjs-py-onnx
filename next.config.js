@@ -14,35 +14,26 @@ const nextConfig = {
         crypto: false,
       }
 
-      // Handle .mjs files as ES modules (don't process with Terser)
-      config.module.rules.push({
-        test: /\.mjs$/,
-        type: 'javascript/esm',
-        resolve: {
-          fullySpecified: false,
-        },
-      })
-
-      // Exclude .mjs files from static optimization
+      // Exclude .mjs files from Terser optimization (only for onnxruntime-web)
       if (config.optimization && config.optimization.minimizer) {
-        config.optimization.minimizer = config.optimization.minimizer.filter(
+        config.optimization.minimizer = config.optimization.minimizer.map(
           (plugin) => {
-            // Don't filter, but modify Terser to exclude .mjs
             if (
               plugin.constructor.name === 'TerserPlugin' ||
               (plugin.options && plugin.options.terserOptions)
             ) {
               const originalExclude = plugin.options?.exclude
+              const excludePattern = /node_modules\/onnxruntime-web.*\.mjs$/
               plugin.options = {
                 ...plugin.options,
                 exclude: originalExclude
                   ? Array.isArray(originalExclude)
-                    ? [...originalExclude, /\.mjs$/]
-                    : [originalExclude, /\.mjs$/]
-                  : /\.mjs$/,
+                    ? [...originalExclude, excludePattern]
+                    : [originalExclude, excludePattern]
+                  : excludePattern,
               }
             }
-            return true
+            return plugin
           }
         )
       }

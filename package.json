@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "postinstall": "node -e \"const fs=require('fs');const path=require('path');const file=path.join(__dirname,'node_modules/onnxruntime-web/dist/ort.node.min.mjs');if(fs.existsSync(file)){fs.writeFileSync(file,'export default {};','utf8');}\""
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "next": "^14.2.0",

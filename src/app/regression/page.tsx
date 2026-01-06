@@ -305,11 +305,11 @@ export default function RegressionDemo() {
             >
               Forecast
             </button>
-            <div className="opacity-80 text-sm">
+            <div className="opacity-80 text-sm text-gray-900 dark:text-gray-100">
               Status: <code className="font-mono">{status}</code>
             </div>
             {currentParams && (
-              <div className="opacity-80 text-sm">
+              <div className="opacity-80 text-sm text-gray-900 dark:text-gray-100">
                 w={currentParams.w.toFixed(4)}, b={currentParams.b.toFixed(4)}
               </div>
             )}
@@ -328,7 +328,7 @@ export default function RegressionDemo() {
               type="text"
               value={forecastX}
               onChange={(e) => setForecastX(e.target.value)}
-              className="w-full p-2 rounded-lg font-mono border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 rounded-lg font-mono border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="6, 7, 8, 9, 10"
             />
           </div>
@@ -336,7 +336,7 @@ export default function RegressionDemo() {
 
         {/* Training Chart */}
         {trainingData && (
-          <div className="border border-gray-300 rounded-2xl p-3">
+          <div className="border border-gray-300 dark:border-gray-600 rounded-2xl p-3">
             {/* @ts-ignore */}
             <Plot
               // @ts-ignore
@@ -357,7 +357,7 @@ export default function RegressionDemo() {
 
         {/* Loss Chart */}
         {lossPlotData.length > 0 && (
-          <div className="border border-gray-300 rounded-2xl p-3">
+          <div className="border border-gray-300 dark:border-gray-600 rounded-2xl p-3">
             {/* @ts-ignore */}
             <Plot
               // @ts-ignore
@@ -378,25 +378,46 @@ export default function RegressionDemo() {
 
         {/* Training History */}
         {gdHistory.length > 0 && (
-          <div className="border border-gray-300 rounded-xl p-4 bg-gray-50 dark:bg-gray-800">
-            <h3 className="font-semibold mb-2">Training History:</h3>
+          <div className="border border-gray-300 dark:border-gray-600 rounded-xl p-4 bg-gray-50 dark:bg-gray-800">
+            <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">
+              Training History:
+            </h3>
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-2">Epoch</th>
-                    <th className="text-left p-2">Weight (w)</th>
-                    <th className="text-left p-2">Bias (b)</th>
-                    <th className="text-left p-2">Loss</th>
+                  <tr className="border-b border-gray-300 dark:border-gray-600">
+                    <th className="text-left p-2 text-gray-900 dark:text-gray-100">
+                      Epoch
+                    </th>
+                    <th className="text-left p-2 text-gray-900 dark:text-gray-100">
+                      Weight (w)
+                    </th>
+                    <th className="text-left p-2 text-gray-900 dark:text-gray-100">
+                      Bias (b)
+                    </th>
+                    <th className="text-left p-2 text-gray-900 dark:text-gray-100">
+                      Loss
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {gdHistory.map((h, i) => (
-                    <tr key={i} className="border-b">
-                      <td className="p-2 font-mono">{h.epoch}</td>
-                      <td className="p-2 font-mono">{h.w.toFixed(4)}</td>
-                      <td className="p-2 font-mono">{h.b.toFixed(4)}</td>
-                      <td className="p-2 font-mono">{h.loss.toFixed(6)}</td>
+                    <tr
+                      key={i}
+                      className="border-b border-gray-200 dark:border-gray-700"
+                    >
+                      <td className="p-2 font-mono text-gray-900 dark:text-gray-100">
+                        {h.epoch}
+                      </td>
+                      <td className="p-2 font-mono text-gray-900 dark:text-gray-100">
+                        {h.w.toFixed(4)}
+                      </td>
+                      <td className="p-2 font-mono text-gray-900 dark:text-gray-100">
+                        {h.b.toFixed(4)}
+                      </td>
+                      <td className="p-2 font-mono text-gray-900 dark:text-gray-100">
+                        {h.loss.toFixed(6)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

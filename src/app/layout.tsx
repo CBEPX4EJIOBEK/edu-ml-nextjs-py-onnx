@@ -16,10 +16,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body className={inter.className}>
         <Navigation />
-        <div className="ml-60 min-h-screen">{children}</div>
+        <div className="ml-60 min-h-screen bg-gray-900 dark:bg-gray-900">
+          {children}
+        </div>
       </body>
     </html>
   )

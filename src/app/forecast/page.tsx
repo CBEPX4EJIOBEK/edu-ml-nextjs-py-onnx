@@ -162,11 +162,11 @@ export default function ForecastDemo() {
             >
               Run forecast
             </button>
-            <div className="opacity-80 text-sm">
+            <div className="opacity-80 text-sm text-gray-900 dark:text-gray-100">
               Status: <code className="font-mono">{status}</code>
             </div>
             {meta && (
-              <div className="opacity-80 text-sm">
+              <div className="opacity-80 text-sm text-gray-900 dark:text-gray-100">
                 window=<code className="font-mono">{meta.window}</code>,
                 horizon=
                 <code className="font-mono">{meta.horizon}</code>
@@ -178,15 +178,15 @@ export default function ForecastDemo() {
             value={csv}
             onChange={(e) => setCsv(e.target.value)}
             rows={6}
-            className="w-full p-3 rounded-xl font-mono border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 rounded-xl font-mono border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="1,2,3,4,..."
           />
-          <div className="opacity-70 text-sm">
+          <div className="opacity-70 text-sm text-gray-900 dark:text-gray-100">
             Parsed points: {series.length}
           </div>
         </div>
 
-        <div className="border border-gray-300 rounded-2xl p-3">
+        <div className="border border-gray-300 dark:border-gray-600 rounded-2xl p-3">
           {/* @ts-ignore */}
           <Plot
             // @ts-ignore
