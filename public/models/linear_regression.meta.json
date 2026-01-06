@@ -1,0 +1,5 @@
+{
+  "input_size": 1,
+  "output_size": 1,
+  "description": "Simple linear regression model"
+}
