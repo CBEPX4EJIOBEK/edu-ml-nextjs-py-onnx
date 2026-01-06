@@ -1,0 +1,36 @@
+{
+  "name": "edu-ml",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3331 -H localhost",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "onnxruntime-web": "^1.23.2",
+    "plotly.js": "^3.3.1",
+    "plotly.js-dist-min": "^3.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-plotly.js": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/plotly.js": "^3.0.9",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "postcss": "^8.4.35",
+    "prettier": "^3.7.4",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.5.0"
+  }
+}
