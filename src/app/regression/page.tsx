@@ -140,8 +140,12 @@ export default function RegressionDemo() {
     let b = Math.random() * 4 - 2
     const lr = 0.01
     const epochs = 100
-    const history: Array<{ epoch: number; w: number; b: number; loss: number }> =
-      []
+    const history: Array<{
+      epoch: number
+      w: number
+      b: number
+      loss: number
+    }> = []
 
     for (let epoch = 0; epoch < epochs; epoch++) {
       const result = gradientDescentStep(
@@ -189,11 +193,10 @@ export default function RegressionDemo() {
     try {
       const results: number[] = []
       for (const x of forecastXValues) {
-        const input = new ort.Tensor(
-          'float32',
-          Float32Array.from([x]),
-          [1, meta.input_size]
-        )
+        const input = new ort.Tensor('float32', Float32Array.from([x]), [
+          1,
+          meta.input_size,
+        ])
 
         const outputs = await session.run({ input })
         const out = outputs['output']
@@ -334,7 +337,9 @@ export default function RegressionDemo() {
         {/* Training Chart */}
         {trainingData && (
           <div className="border border-gray-300 rounded-2xl p-3">
+            {/* @ts-ignore */}
             <Plot
+              // @ts-ignore
               data={trainingPlotData as any}
               layout={{
                 title: 'Linear Regression: Training Data & Model',
@@ -353,7 +358,9 @@ export default function RegressionDemo() {
         {/* Loss Chart */}
         {lossPlotData.length > 0 && (
           <div className="border border-gray-300 rounded-2xl p-3">
+            {/* @ts-ignore */}
             <Plot
+              // @ts-ignore
               data={lossPlotData as any}
               layout={{
                 title: 'Gradient Descent: Loss Over Time',

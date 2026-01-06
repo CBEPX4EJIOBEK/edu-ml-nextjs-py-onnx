@@ -187,7 +187,9 @@ export default function ForecastDemo() {
         </div>
 
         <div className="border border-gray-300 rounded-2xl p-3">
+          {/* @ts-ignore */}
           <Plot
+            // @ts-ignore
             data={plotData as any}
             layout={{
               title: 'History + Forecast',

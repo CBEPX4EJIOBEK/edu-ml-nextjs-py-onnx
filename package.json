@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "postinstall": "node -e \"const fs=require('fs');const path=require('path');const file=path.join(__dirname,'node_modules/onnxruntime-web/dist/ort.node.min.mjs');if(fs.existsSync(file)){fs.writeFileSync(file,'export default {};','utf8');}\""
   },
   "dependencies": {
     "next": "^14.2.0",
@@ -28,6 +29,7 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.0",
     "eslint-config-prettier": "^10.1.8",
+    "null-loader": "^4.0.1",
     "postcss": "^8.4.35",
     "prettier": "^3.7.4",
     "tailwindcss": "^3.4.1",
