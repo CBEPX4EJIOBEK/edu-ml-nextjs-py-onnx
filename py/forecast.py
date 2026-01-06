@@ -5,8 +5,8 @@ import torch
 import torch.nn as nn
 
 
-WINDOW = 24  # сколько точек на вход
-HORIZON = 12  # сколько точек прогнозируем
+WINDOW = 24  # number of input points
+HORIZON = 12  # number of points to forecast
 
 
 class ForecastMLP(nn.Module):
@@ -26,7 +26,7 @@ class ForecastMLP(nn.Module):
 
 
 def make_toy_data(n_series=512, total_len=WINDOW + HORIZON):
-    # Синус + шум, чтобы быстро "обучить" демо-модель
+    # Sine wave + noise to quickly train a demo model
     X = []
     Y = []
     rng = np.random.default_rng(0)
@@ -60,7 +60,7 @@ def train_model():
     opt = torch.optim.Adam(model.parameters(), lr=1e-3)
     loss_fn = nn.MSELoss()
 
-    # Быстрая "учебка" для демо
+    # Quick training for demo
     for _ in range(300):
         opt.zero_grad()
         pred = model(x_t)
