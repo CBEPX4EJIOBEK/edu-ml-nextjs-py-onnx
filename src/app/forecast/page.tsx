@@ -30,7 +30,7 @@ export default function ForecastDemo() {
   const [status, setStatus] = useState<string>('loading…')
 
   const [csv, setCsv] = useState<string>(() => {
-    // демо-ряд
+    // demo time series
     const xs = Array.from({ length: 80 }, (_, i) => Math.sin(i / 6))
     return xs.map((x) => x.toFixed(4)).join(', ')
   })
@@ -48,13 +48,13 @@ export default function ForecastDemo() {
         if (cancelled) return
         setMeta(m)
 
-        // (опционально) ускорение / настройка wasm:
+        // (optional) acceleration / wasm configuration:
         // ort.env.wasm.numThreads = Math.min(4, navigator.hardwareConcurrency || 1);
 
         setStatus('creating session…')
 
-        // Пытаемся WebGPU, если есть, иначе wasm.
-        // ONNX Runtime Web позволяет указать executionProviders списком.  [oai_citation:2‡ONNX Runtime](https://onnxruntime.ai/docs/tutorials/web/env-flags-and-session-options.html?utm_source=chatgpt.com)
+        // Try WebGPU if available, otherwise wasm.
+        // ONNX Runtime Web allows specifying executionProviders as a list.
         const s = await ort.InferenceSession.create('/models/forecast.onnx', {
           executionProviders: ['webgpu', 'wasm'],
           graphOptimizationLevel: 'all',
@@ -87,7 +87,7 @@ export default function ForecastDemo() {
 
     setStatus('running inference…')
 
-    // Берем последние WINDOW точек и нормализуем
+    // Take the last WINDOW points and normalize
     const windowVals = series.slice(-meta.window)
     const { m, sd } = meanStd(windowVals)
     const norm = windowVals.map((x) => (x - m) / sd)
@@ -103,13 +103,13 @@ export default function ForecastDemo() {
     if (!out) throw new Error('Missing output')
 
     const yNorm = Array.from(out.data as Float32Array)
-    const y = yNorm.map((x) => x * sd + m) // денормализация
+    const y = yNorm.map((x) => x * sd + m) // denormalize
 
     setForecast(y)
     setStatus('ready ✅')
   }
 
-  // Данные для графика
+  // Data for the chart
   const plotData = useMemo(() => {
     const xHist = series.map((_, i) => i)
     const yHist = series
