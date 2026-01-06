@@ -25,6 +25,9 @@ jobs:
 
       - name: Install Node.js dependencies
         run: yarn install --frozen-lockfile
+        env:
+          CI: true
+          NODE_ENV: production
 
       - name: Create Python virtual environment
         run: make venv
