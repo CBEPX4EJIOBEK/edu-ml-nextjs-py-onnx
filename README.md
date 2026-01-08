@@ -315,15 +315,18 @@ Configure the following secrets in your GitHub repository settings (`Settings > 
   - Get it from: https://vercel.com/account/tokens
   - Create a new token with appropriate permissions
 
-- **`VERCEL_SCOPE`**: Your Vercel team/scope ID
+- **`VERCEL_SCOPE`**: Your Vercel team/scope ID (also used as organization ID)
   - Format: `team_<id>` or your username/team name
   - Find it in your Vercel dashboard or by running `vercel whoami` locally
+  - This is used as both scope and organization ID (required by Vercel CLI v50+)
   - Example: `team_yGAqxKgDjkzRfs5NLzpxKfXI`
 
 - **`VERCEL_PROJECT_ID`**: Your Vercel project ID
   - Format: `prj_<id>`
   - Find it in your Vercel project settings or `.vercel/project.json` after linking
   - Example: `prj_escRKuAAuVFptwS81QVz7MvrLddI`
+  
+**Note**: Vercel CLI v50+ requires both `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`. The workflow automatically uses `VERCEL_SCOPE` as the organization ID, so you don't need to set `VERCEL_ORG_ID` separately.
 
 #### How to Find Your Vercel IDs
 
