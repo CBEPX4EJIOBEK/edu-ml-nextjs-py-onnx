@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
-import * as ort from 'onnxruntime-web'
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false })
 
@@ -26,7 +25,8 @@ function meanStd(xs: number[]) {
 
 export default function ForecastDemo() {
   const [meta, setMeta] = useState<Meta | null>(null)
-  const [session, setSession] = useState<ort.InferenceSession | null>(null)
+  const [session, setSession] = useState<any>(null)
+  const [ortApi, setOrtApi] = useState<any>(null)
   const [status, setStatus] = useState<string>('loading…')
 
   const [csv, setCsv] = useState<string>(() => {
@@ -55,10 +55,16 @@ export default function ForecastDemo() {
 
         // Try WebGPU if available, otherwise wasm.
         // ONNX Runtime Web allows specifying executionProviders as a list.
-        const s = await ort.InferenceSession.create('/models/forecast.onnx', {
-          executionProviders: ['webgpu', 'wasm'],
-          graphOptimizationLevel: 'all',
-        })
+        const ortMod: any = await import('onnxruntime-web')
+        const ortAny: any = ortMod?.default ?? ortMod
+        setOrtApi(ortAny)
+        const s = await ortAny.InferenceSession.create(
+          '/models/forecast.onnx',
+          {
+            executionProviders: ['webgpu', 'wasm'],
+            graphOptimizationLevel: 'all',
+          }
+        )
 
         if (cancelled) return
         setSession(s)
@@ -77,7 +83,7 @@ export default function ForecastDemo() {
   const [forecast, setForecast] = useState<number[] | null>(null)
 
   async function runForecast() {
-    if (!meta || !session) return
+    if (!meta || !session || !ortApi) return
 
     if (series.length < meta.window) {
       setForecast(null)
@@ -93,7 +99,7 @@ export default function ForecastDemo() {
     const norm = windowVals.map((x) => (x - m) / sd)
 
     // ort.Tensor: float32 [1, window]
-    const input = new ort.Tensor('float32', Float32Array.from(norm), [
+    const input = new ortApi.Tensor('float32', Float32Array.from(norm), [
       1,
       meta.window,
     ])
@@ -155,8 +161,10 @@ export default function ForecastDemo() {
               disabled={
                 !session ||
                 !meta ||
+                !ortApi ||
                 status.startsWith('loading') ||
-                status.startsWith('creating')
+                status.startsWith('creating') ||
+                status.startsWith('running')
               }
               className="px-3.5 py-2.5 rounded-lg cursor-pointer bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >

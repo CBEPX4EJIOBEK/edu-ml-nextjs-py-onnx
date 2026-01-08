@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
-import * as ort from 'onnxruntime-web'
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false })
 
@@ -51,7 +50,8 @@ function gradientDescentStep(
 
 export default function RegressionDemo() {
   const [meta, setMeta] = useState<Meta | null>(null)
-  const [session, setSession] = useState<ort.InferenceSession | null>(null)
+  const [session, setSession] = useState<any>(null)
+  const [ortApi, setOrtApi] = useState<any>(null)
   const [status, setStatus] = useState<string>('loading…')
 
   // Training data
@@ -87,7 +87,10 @@ export default function RegressionDemo() {
 
         setStatus('creating session…')
 
-        const s = await ort.InferenceSession.create(
+        const ortMod: any = await import('onnxruntime-web')
+        const ortAny: any = ortMod?.default ?? ortMod
+        setOrtApi(ortAny)
+        const s = await ortAny.InferenceSession.create(
           '/models/linear_regression.onnx',
           {
             executionProviders: ['webgpu', 'wasm'],
@@ -177,7 +180,7 @@ export default function RegressionDemo() {
   }
 
   async function runForecast() {
-    if (!meta || !session || !currentParams) {
+    if (!meta || !session || !currentParams || !ortApi) {
       setStatus('need to train model first')
       return
     }
@@ -193,7 +196,7 @@ export default function RegressionDemo() {
     try {
       const results: number[] = []
       for (const x of forecastXValues) {
-        const input = new ort.Tensor('float32', Float32Array.from([x]), [
+        const input = new ortApi.Tensor('float32', Float32Array.from([x]), [
           1,
           meta.input_size,
         ])
@@ -297,9 +300,12 @@ export default function RegressionDemo() {
               disabled={
                 !session ||
                 !meta ||
+                !ortApi ||
                 !currentParams ||
                 status.startsWith('loading') ||
-                status.startsWith('creating')
+                status.startsWith('creating') ||
+                status.startsWith('forecasting') ||
+                status.startsWith('Running')
               }
               className="px-3.5 py-2.5 rounded-lg cursor-pointer bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >

@@ -33,7 +33,7 @@ const nextConfig = {
         crypto: false,
       }
 
-      // Exclude .mjs files from Terser optimization
+      // Exclude all onnxruntime-web .mjs files from Terser optimization
       if (config.optimization && config.optimization.minimizer) {
         config.optimization.minimizer = config.optimization.minimizer.map(
           (plugin) => {
@@ -42,7 +42,8 @@ const nextConfig = {
               (plugin.options && plugin.options.terserOptions)
             ) {
               const originalExclude = plugin.options?.exclude
-              const excludePattern = /ort\.node\.min\.mjs$/
+              // Exclude all .mjs files from onnxruntime-web that contain import.meta
+              const excludePattern = /node_modules[\/\\]onnxruntime-web[\/\\].*\.mjs$/
               plugin.options = {
                 ...plugin.options,
                 exclude: originalExclude
@@ -68,7 +69,13 @@ const nextConfig = {
               },
               (assets) => {
                 Object.keys(assets).forEach((filename) => {
-                  if (filename.includes('ort.node.min.mjs')) {
+                  // Remove all onnxruntime-web .mjs files that contain import.meta
+                  if (
+                    filename.includes('onnxruntime-web') &&
+                    filename.endsWith('.mjs') &&
+                    (filename.includes('ort.node.min.mjs') ||
+                      filename.includes('ort.bundle.min.mjs'))
+                  ) {
                     delete assets[filename]
                   }
                 })
