@@ -9,8 +9,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "postinstall": "node -e \"if(process.env.CI||process.env.NODE_ENV==='production'){const fs=require('fs');const path=require('path');const ortDir=path.join(__dirname,'node_modules/onnxruntime-web/dist');if(fs.existsSync(ortDir)){const files=fs.readdirSync(ortDir).filter(f=>f.endsWith('.mjs')&&(f.includes('node')||f.includes('bundle')));files.forEach(f=>{const file=path.join(ortDir,f);fs.writeFileSync(file,'export default {};','utf8');console.log('Replaced:',f);});}}\"",
-    "prebuild": "node -e \"const fs=require('fs');const path=require('path');const ortDir=path.join(__dirname,'node_modules/onnxruntime-web/dist');if(fs.existsSync(ortDir)){const files=fs.readdirSync(ortDir).filter(f=>f.endsWith('.mjs')&&(f.includes('node')||f.includes('bundle')));files.forEach(f=>{const file=path.join(ortDir,f);fs.writeFileSync(file,'export default {};','utf8');});}\"",
+    "postinstall": "node -e \"if(process.env.CI||process.env.NODE_ENV==='production'){const fs=require('fs');const path=require('path');const ortDir=path.join(__dirname,'node_modules/onnxruntime-web/dist');if(fs.existsSync(ortDir)){const files=fs.readdirSync(ortDir).filter(f=>f.endsWith('.mjs')&&f.includes('node')&&!f.includes('bundle'));files.forEach(f=>{const file=path.join(ortDir,f);fs.writeFileSync(file,'export default {};','utf8');console.log('Replaced:',f);});}}\"",
+    "prebuild": "node -e \"const fs=require('fs');const path=require('path');const ortDir=path.join(__dirname,'node_modules/onnxruntime-web/dist');if(fs.existsSync(ortDir)){const files=fs.readdirSync(ortDir).filter(f=>f.endsWith('.mjs')&&f.includes('node')&&!f.includes('bundle'));files.forEach(f=>{const file=path.join(ortDir,f);fs.writeFileSync(file,'export default {};','utf8');});}\"",
     "restore-ort": "node -e \"const fs=require('fs');const path=require('path');const {execSync}=require('child_process');console.log('Restoring onnxruntime-web files...');execSync('rm -rf node_modules/onnxruntime-web && yarn add onnxruntime-web@^1.23.2',{stdio:'inherit'});\""
   },
   "dependencies": {

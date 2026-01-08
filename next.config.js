@@ -34,6 +34,22 @@ const nextConfig = {
       }
 
       // Exclude all onnxruntime-web .mjs files from Terser optimization
+      // Also exclude them from webpack processing entirely
+      config.module = config.module || {}
+      config.module.rules = config.module.rules || []
+      
+      // Add rule to prevent webpack from processing onnxruntime-web .mjs files
+      // They'll be loaded at runtime via dynamic import
+      config.module.rules.push({
+        test: /node_modules[\/\\]onnxruntime-web[\/\\]dist[\/\\].*\.mjs$/,
+        type: 'javascript/auto',
+        parser: {
+          javascript: {
+            dynamicImportMode: 'eager',
+          },
+        },
+      })
+
       if (config.optimization && config.optimization.minimizer) {
         config.optimization.minimizer = config.optimization.minimizer.map(
           (plugin) => {
@@ -42,15 +58,39 @@ const nextConfig = {
               (plugin.options && plugin.options.terserOptions)
             ) {
               const originalExclude = plugin.options?.exclude
-              // Exclude all .mjs files from onnxruntime-web that contain import.meta
-              const excludePattern = /node_modules[\/\\]onnxruntime-web[\/\\].*\.mjs$/
+              // Exclude ALL .mjs files from onnxruntime-web - they're already minified
+              // Use a function for more precise matching
+              const excludeFunc = (modulePath) => {
+                if (typeof modulePath === 'string' && 
+                    modulePath.includes('onnxruntime-web') && 
+                    modulePath.includes('dist') &&
+                    modulePath.endsWith('.mjs')) {
+                  return true
+                }
+                if (originalExclude) {
+                  if (typeof originalExclude === 'function') {
+                    return originalExclude(modulePath)
+                  }
+                  if (originalExclude instanceof RegExp) {
+                    return originalExclude.test(modulePath)
+                  }
+                  if (Array.isArray(originalExclude)) {
+                    return originalExclude.some(pattern => 
+                      typeof pattern === 'function' ? pattern(modulePath) :
+                      pattern instanceof RegExp ? pattern.test(modulePath) :
+                      typeof pattern === 'string' ? modulePath.includes(pattern) : false
+                    )
+                  }
+                  if (typeof originalExclude === 'string') {
+                    return modulePath.includes(originalExclude)
+                  }
+                }
+                return false
+              }
+              
               plugin.options = {
                 ...plugin.options,
-                exclude: originalExclude
-                  ? Array.isArray(originalExclude)
-                    ? [...originalExclude, excludePattern]
-                    : [originalExclude, excludePattern]
-                  : excludePattern,
+                exclude: excludeFunc,
               }
             }
             return plugin
@@ -69,12 +109,11 @@ const nextConfig = {
               },
               (assets) => {
                 Object.keys(assets).forEach((filename) => {
-                  // Remove all onnxruntime-web .mjs files that contain import.meta
+                  // Only remove Node.js-specific files, NOT browser bundle files
                   if (
                     filename.includes('onnxruntime-web') &&
                     filename.endsWith('.mjs') &&
-                    (filename.includes('ort.node.min.mjs') ||
-                      filename.includes('ort.bundle.min.mjs'))
+                    filename.includes('ort.node.min.mjs')
                   ) {
                     delete assets[filename]
                   }

@@ -61,22 +61,24 @@ export default function ForecastDemo() {
         const ortApi: any = ort.InferenceSession
           ? ort // Named exports (ort.InferenceSession)
           : ort.default?.InferenceSession
-          ? ort.default // Default export with InferenceSession
-          : ort.default || ort // Fallback
-        
+            ? ort.default // Default export with InferenceSession
+            : ort.default || ort // Fallback
+
         if (!ortApi?.InferenceSession) {
           console.error('ONNX Runtime Web import failed. Module structure:', {
             hasInferenceSession: !!ort.InferenceSession,
             hasDefault: !!ort.default,
             hasDefaultInferenceSession: !!ort.default?.InferenceSession,
             allKeys: Object.keys(ort),
-            defaultKeys: ort.default ? Object.keys(ort.default).slice(0, 15) : [],
+            defaultKeys: ort.default
+              ? Object.keys(ort.default).slice(0, 15)
+              : [],
           })
           throw new Error(
             'Failed to load ONNX Runtime Web API. InferenceSession not found. Check browser console for details.'
           )
         }
-        
+
         setOrtApi(ortApi)
         const s = await ortApi.InferenceSession.create(
           '/models/forecast.onnx',
