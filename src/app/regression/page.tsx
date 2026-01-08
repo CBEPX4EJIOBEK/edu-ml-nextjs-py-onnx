@@ -87,10 +87,30 @@ export default function RegressionDemo() {
 
         setStatus('creating session…')
 
-        const ortMod: any = await import('onnxruntime-web')
-        const ortAny: any = ortMod?.default ?? ortMod
-        setOrtApi(ortAny)
-        const s = await ortAny.InferenceSession.create(
+        const ort = await import('onnxruntime-web')
+        // onnxruntime-web exports InferenceSession as a named export
+        // Try named export first, then default export
+        const ortApi: any = ort.InferenceSession
+          ? ort // Named exports (ort.InferenceSession)
+          : ort.default?.InferenceSession
+          ? ort.default // Default export with InferenceSession
+          : ort.default || ort // Fallback
+        
+        if (!ortApi?.InferenceSession) {
+          console.error('ONNX Runtime Web import failed. Module structure:', {
+            hasInferenceSession: !!ort.InferenceSession,
+            hasDefault: !!ort.default,
+            hasDefaultInferenceSession: !!ort.default?.InferenceSession,
+            allKeys: Object.keys(ort),
+            defaultKeys: ort.default ? Object.keys(ort.default).slice(0, 15) : [],
+          })
+          throw new Error(
+            'Failed to load ONNX Runtime Web API. InferenceSession not found. Check browser console for details.'
+          )
+        }
+        
+        setOrtApi(ortApi)
+        const s = await ortApi.InferenceSession.create(
           '/models/linear_regression.onnx',
           {
             executionProviders: ['webgpu', 'wasm'],
