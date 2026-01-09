@@ -110,8 +110,11 @@ export default function RegressionDemo() {
         }
         
         setOrtApi(ortApi)
+        // Ensure the model path is a proper string URL
+        // onnxruntime-web expects a string URL, not a URL object
+        const modelPath = String('/models/linear_regression.onnx')
         const s = await ortApi.InferenceSession.create(
-          '/models/linear_regression.onnx',
+          modelPath,
           {
             executionProviders: ['webgpu', 'wasm'],
             graphOptimizationLevel: 'all',

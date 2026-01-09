@@ -80,8 +80,11 @@ export default function ForecastDemo() {
         }
 
         setOrtApi(ortApi)
+        // Ensure the model path is a proper string URL
+        // onnxruntime-web expects a string URL, not a URL object
+        const modelPath = String('/models/forecast.onnx')
         const s = await ortApi.InferenceSession.create(
-          '/models/forecast.onnx',
+          modelPath,
           {
             executionProviders: ['webgpu', 'wasm'],
             graphOptimizationLevel: 'all',
