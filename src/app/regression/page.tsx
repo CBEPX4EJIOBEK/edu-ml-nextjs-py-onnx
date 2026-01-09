@@ -93,33 +93,39 @@ export default function RegressionDemo() {
         const ortApi: any = ort.InferenceSession
           ? ort // Named exports (ort.InferenceSession)
           : ort.default?.InferenceSession
-          ? ort.default // Default export with InferenceSession
-          : ort.default || ort // Fallback
-        
+            ? ort.default // Default export with InferenceSession
+            : ort.default || ort // Fallback
+
         if (!ortApi?.InferenceSession) {
           console.error('ONNX Runtime Web import failed. Module structure:', {
             hasInferenceSession: !!ort.InferenceSession,
             hasDefault: !!ort.default,
             hasDefaultInferenceSession: !!ort.default?.InferenceSession,
             allKeys: Object.keys(ort),
-            defaultKeys: ort.default ? Object.keys(ort.default).slice(0, 15) : [],
+            defaultKeys: ort.default
+              ? Object.keys(ort.default).slice(0, 15)
+              : [],
           })
           throw new Error(
             'Failed to load ONNX Runtime Web API. InferenceSession not found. Check browser console for details.'
           )
         }
-        
+
         setOrtApi(ortApi)
-        // Ensure the model path is a proper string URL
-        // onnxruntime-web expects a string URL, not a URL object
-        const modelPath = String('/models/linear_regression.onnx')
-        const s = await ortApi.InferenceSession.create(
-          modelPath,
-          {
-            executionProviders: ['webgpu', 'wasm'],
-            graphOptimizationLevel: 'all',
-          }
-        )
+        // Fetch model as bytes to avoid URL processing issues
+        setStatus('loading model…')
+        const modelResponse = await fetch('/models/linear_regression.onnx')
+        if (!modelResponse.ok) {
+          throw new Error(`Failed to fetch model: ${modelResponse.statusText}`)
+        }
+        const modelArrayBuffer = await modelResponse.arrayBuffer()
+        const modelBytes = new Uint8Array(modelArrayBuffer)
+        
+        // Create session with model bytes instead of URL
+        const s = await ortApi.InferenceSession.create(modelBytes, {
+          executionProviders: ['webgpu', 'wasm'],
+          graphOptimizationLevel: 'all',
+        })
 
         if (cancelled) return
         setSession(s)

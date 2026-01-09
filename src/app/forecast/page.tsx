@@ -80,16 +80,20 @@ export default function ForecastDemo() {
         }
 
         setOrtApi(ortApi)
-        // Ensure the model path is a proper string URL
-        // onnxruntime-web expects a string URL, not a URL object
-        const modelPath = String('/models/forecast.onnx')
-        const s = await ortApi.InferenceSession.create(
-          modelPath,
-          {
-            executionProviders: ['webgpu', 'wasm'],
-            graphOptimizationLevel: 'all',
-          }
-        )
+        // Fetch model as bytes to avoid URL processing issues
+        setStatus('loading model…')
+        const modelResponse = await fetch('/models/forecast.onnx')
+        if (!modelResponse.ok) {
+          throw new Error(`Failed to fetch model: ${modelResponse.statusText}`)
+        }
+        const modelArrayBuffer = await modelResponse.arrayBuffer()
+        const modelBytes = new Uint8Array(modelArrayBuffer)
+        
+        // Create session with model bytes instead of URL
+        const s = await ortApi.InferenceSession.create(modelBytes, {
+          executionProviders: ['webgpu', 'wasm'],
+          graphOptimizationLevel: 'all',
+        })
 
         if (cancelled) return
         setSession(s)
